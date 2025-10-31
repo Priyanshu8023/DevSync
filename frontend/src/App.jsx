@@ -30,6 +30,10 @@ import LeetCode from "./Components/DashBoard/LeetCode";
 import FloatingSupportButton from "./Components/ui/Support";
 import FeedbackReviewPage from "./Components/feedback/FeedbackReviewPage";
 
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+import NotFound from "./Components/ui/NotFound";
+
 function Home() {
   const [showTop, setShowTop] = useState(false);
 
@@ -138,7 +142,20 @@ function App() {
         <Route path="/dashboard/github/:username" element={<GitHubProfile />} />
         <Route path="/leetcode/:leetUser" element={<LeetCode />} />
         <Route path="/feedback" element={<FeedbackReviewPage />} />
+        <Route path='*' element={<NotFound/>}/>
       </Routes>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
     </TimerProvider>
   );
 }

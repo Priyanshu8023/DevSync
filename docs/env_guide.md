@@ -17,6 +17,9 @@ PORT=5000
 # URL of the frontend client
 CLIENT_URL=http://localhost:5173
 
+# ID of the chrome extension, if should be in frontend .env 
+VITE_CHROME_EXTENSION_ID =<your-extension-id> 
+
 # -----------------------------
 # Database Settings
 # -----------------------------
@@ -29,7 +32,7 @@ MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/<dbname>?re
 # -----------------------------
 
 # Secret key for signing JSON Web Tokens
-JWT_SECRET=<your-jwt-secret>
+JWT_SECRET=<jwt-secret>
 
 # Secret key for session cookies
 SESSION_SECRET=<your-session-secret>
