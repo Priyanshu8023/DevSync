@@ -8,6 +8,7 @@ const User = require('../models/User');
 const fs = require('fs');
 const crypto = require('crypto');
 const LeetCode = require("../models/Leetcode")
+const CodeChef = require("../models/CodeChef")
 
 // Helper function to generate avatar URL from email or name
 const generateAvatarUrl = (email, name) => {

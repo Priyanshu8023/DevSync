@@ -1,34 +1,48 @@
+const cron = require("node-cron");
+const CodeChef = require("../models/CodeChef")
 const axios = require("axios");
-const jsdom = require("jsdom");
-const express = require("express");
-const cors = require("cors");
-const { default: rateLimit } = require("express-rate-limit");
-const { JSDOM } = jsdom;
 
-const app = express();
-exports.app = app;
+const batchLimit = 50; // number users should update for the each hour
 
-const limiter = rateLimit({
-  windowMs: 60 * 1000,
-  limit: 60,
-});
-exports.limiter = limiter;
+const runCodeChefbatchUpdate = async () => {
+  try {
+    console.log("Starting batch update for CodeChef users...");
 
-app.use(limiter);
-app.use(cors());
-app.set("view engine", "ejs");
-app.set("views", __dirname + "/views");
-app.use(express.static(__dirname + "/static"));
-app.get("/heatmap/:handle", (req, res) => {
-  let theme = req.query.theme == "night" ? "night" : "day";
-  res.render("heatmap", { handle: req.params.handle, theme });
-});
-app.get("/rating/:handle", (req, res) => {
-  res.render("rating", { handle: req.params.handle });
-});
+    const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
+    const usersToUpdate = await CodeChef.find({
+      lastUpdated: { $lt: sixHoursAgo },
+    }).limit(batchLimit);
 
-//Function to fetch CodeChef user data
-const getCodeChefData = async (handle) => {
+    const totalUsers = usersToUpdate.length;
+
+    if(totalUsers === 0) {
+      return;
+    }
+
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const user of usersToUpdate) {
+      try{
+        await updateUserCodeChefProfile(user.username)
+        successCount++;
+      }catch(err){
+        console.error(`Failed to Update user ${user.username}`)
+        failCount++;
+      }
+    }
+
+    console.log(`Summary: Total: ${totalUsers}, Successfuly update: ${successCount}, Failed: ${failCount}`);
+  }catch(err){
+    console.log(`Error in batch Update`,err);
+  }
+};
+
+runCodeChefbatchUpdate();
+
+cron.schedule('0 * * * *', runCodeChefbatchUpdate);//execute on each hour
+
+const updateUserCodeChefProfile = async (username) =>{
   try {
     const resdata = await fetch(
       `https://www.codechef.com/users/${handle}`
@@ -90,7 +104,3 @@ const getCodeChefData = async (handle) => {
     return { success: false, status: 404 }
   }
 }
-
- 
-
- 
